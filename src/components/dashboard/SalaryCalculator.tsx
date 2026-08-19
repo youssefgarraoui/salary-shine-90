@@ -78,8 +78,8 @@ export function SalaryCalculator({
   ];
 
   const breakdown = [
-    { name: "Net salary", value: Math.max(result.net, 0), fill: "var(--color-chart-2)" },
-    { name: "Tax", value: Math.max(result.tax, 0), fill: "var(--color-chart-1)" },
+    { name: "Net salary", value: Math.max(result.net, 0), fill: "var(--chart-2)" },
+    { name: "Tax", value: Math.max(result.tax, 0), fill: "var(--chart-1)" },
   ];
 
   const comparison = [
@@ -236,8 +236,8 @@ export function SalaryCalculator({
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
                 <YAxis hide />
                 <Tooltip formatter={(v: number) => fmt(v)} />
-                <Bar dataKey="Net" fill="var(--color-chart-2)" radius={[6, 6, 0, 0]} isAnimationActive={false} />
-                <Bar dataKey="Tax" fill="var(--color-chart-1)" radius={[6, 6, 0, 0]} isAnimationActive={false} />
+                <Bar dataKey="Net" fill="var(--chart-2)" radius={[6, 6, 0, 0]} isAnimationActive={false} />
+                <Bar dataKey="Tax" fill="var(--chart-1)" radius={[6, 6, 0, 0]} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </div>
