@@ -188,7 +188,14 @@ export function SalaryCalculator({
           <div className="h-44">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={breakdown} dataKey="value" innerRadius={45} outerRadius={70} paddingAngle={2}>
+                <Pie
+                  data={breakdown}
+                  dataKey="value"
+                  innerRadius={45}
+                  outerRadius={70}
+                  paddingAngle={2}
+                  isAnimationActive={false}
+                >
                   {breakdown.map((d) => (
                     <Cell key={d.name} fill={d.fill} stroke="none" />
                   ))}
@@ -229,8 +236,8 @@ export function SalaryCalculator({
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
                 <YAxis hide />
                 <Tooltip formatter={(v: number) => fmt(v)} />
-                <Bar dataKey="Net" fill="var(--color-chart-2)" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="Tax" fill="var(--color-chart-1)" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="Net" fill="var(--color-chart-2)" radius={[6, 6, 0, 0]} isAnimationActive={false} />
+                <Bar dataKey="Tax" fill="var(--color-chart-1)" radius={[6, 6, 0, 0]} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </div>
