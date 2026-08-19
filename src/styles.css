@@ -148,3 +148,21 @@
     color: var(--color-foreground);
   }
 }
+
+@utility card-surface {
+  background-color: var(--color-card);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border);
+}
+
+@utility gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility page-surface {
+  background: var(--gradient-surface);
+}
