@@ -12,6 +12,7 @@ import {
 } from "recharts";
 
 import { Button } from "@/components/ui/button";
+import { FlagIcon } from "@/components/dashboard/FlagIcon";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
@@ -84,12 +85,12 @@ export function SalaryCalculator({
 
   const comparison = [
     {
-      name: `${country.flag} ${country.name}`,
+      name: country.name,
       Tax: Math.round(result.tax),
       Net: Math.round(result.net),
     },
     {
-      name: `${compare.flag} ${compare.name}`,
+      name: compare.name,
       Tax: Math.round(compareResult.tax),
       Net: Math.round(compareResult.net),
     },
@@ -149,7 +150,9 @@ export function SalaryCalculator({
             <SelectContent>
               {COUNTRIES.map((c) => (
                 <SelectItem key={c.code} value={c.code}>
-                  {c.flag} {c.name}
+                  <span className="flex items-center gap-2">
+                    <FlagIcon code={c.code} name={c.name} /> {c.name}
+                  </span>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -224,7 +227,9 @@ export function SalaryCalculator({
               <SelectContent>
                 {COUNTRIES.filter((c) => c.code !== country.code).map((c) => (
                   <SelectItem key={c.code} value={c.code}>
-                    {c.flag} {c.name}
+                    <span className="flex items-center gap-2">
+                      <FlagIcon code={c.code} name={c.name} /> {c.name}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -261,7 +266,9 @@ export function SalaryCalculator({
             ].map(({ c, r }) => (
               <tr key={c.code} className="border-t border-border">
                 <td className="px-4 py-3 font-medium">
-                  {c.flag} {c.name}
+                  <span className="flex items-center gap-2">
+                    <FlagIcon code={c.code} name={c.name} /> {c.name}
+                  </span>
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums">{(r.rate * 100).toFixed(1)}%</td>
                 <td className="px-4 py-3 text-right tabular-nums">{fmt(r.tax)}</td>
