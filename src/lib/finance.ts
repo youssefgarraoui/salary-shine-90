@@ -196,5 +196,5 @@ export function formatMoney(value: number, currency: CurrencyCode) {
 }
 
 export function getCountry(code: string) {
-  return COUNTRIES.find((c) => c.code === code) ?? COUNTRIES[0];
+  return (COUNTRIES.find((c) => c.code === code) ?? COUNTRIES[0]) as Country;
 }
