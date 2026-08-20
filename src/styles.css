@@ -166,3 +166,27 @@
 @utility page-surface {
   background: var(--gradient-surface);
 }
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .page-surface {
+    background: #fff;
+  }
+
+  .card-surface {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
