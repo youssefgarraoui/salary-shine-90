@@ -187,8 +187,8 @@ export function computeSalary(gross: number, country: Country): SalaryResult {
   };
 }
 
-export function formatMoney(value: number, currency: CurrencyCode) {
-  return new Intl.NumberFormat("en-US", {
+export function formatMoney(value: number, currency: CurrencyCode, locale = "en-US") {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     maximumFractionDigits: currency === "JPY" ? 0 : 2,

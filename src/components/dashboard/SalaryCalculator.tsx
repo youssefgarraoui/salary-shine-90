@@ -1,4 +1,4 @@
-import { Calculator, Download, RotateCcw, Wallet } from "lucide-react";
+import { Calculator, Download, FileText, RotateCcw, Wallet } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -31,6 +31,7 @@ import {
   getCountry,
   type SalaryResult,
 } from "@/lib/finance";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   salary: string;
@@ -51,6 +52,7 @@ export function SalaryCalculator({
   setCompareCode,
   onReset,
 }: Props) {
+  const { t, locale } = useI18n();
   const country = getCountry(countryCode);
   const compare = getCountry(compareCode);
   const gross = Math.max(0, Number(salary) || 0);
@@ -68,41 +70,46 @@ export function SalaryCalculator({
     weekly: convert(compareRaw.weekly, compare.currency, country.currency),
   };
 
-  const fmt = (v: number) => formatMoney(v, country.currency);
+  const fmt = (v: number) => formatMoney(v, country.currency, locale);
+  const cname = (code: string) => t(code);
 
   const rows: { label: string; value: string; strong?: boolean }[] = [
-    { label: "Gross annual salary", value: fmt(result.gross) },
-    { label: "Estimated tax", value: `− ${fmt(result.tax)}` },
-    { label: "Net annual salary", value: fmt(result.net), strong: true },
-    { label: "Net monthly salary", value: fmt(result.monthly) },
-    { label: "Net weekly salary", value: fmt(result.weekly) },
+    { label: t("grossAnnual"), value: fmt(result.gross) },
+    { label: t("estTax"), value: `− ${fmt(result.tax)}` },
+    { label: t("netAnnual"), value: fmt(result.net), strong: true },
+    { label: t("netMonthly"), value: fmt(result.monthly) },
+    { label: t("netWeekly"), value: fmt(result.weekly) },
   ];
 
   const breakdown = [
-    { name: "Net salary", value: Math.max(result.net, 0), fill: "#0d9488" },
-    { name: "Tax", value: Math.max(result.tax, 0), fill: "#2563eb" },
+    { name: t("netSalary"), value: Math.max(result.net, 0), fill: "#0d9488" },
+    { name: t("tax"), value: Math.max(result.tax, 0), fill: "#2563eb" },
   ];
 
   const comparison = [
     {
-      name: country.name,
-      Tax: Math.round(result.tax),
-      Net: Math.round(result.net),
+      name: cname(country.code),
+      [t("tax")]: Math.round(result.tax),
+      [t("netSalary")]: Math.round(result.net),
     },
     {
-      name: compare.name,
-      Tax: Math.round(compareResult.tax),
-      Net: Math.round(compareResult.net),
+      name: cname(compare.code),
+      [t("tax")]: Math.round(compareResult.tax),
+      [t("netSalary")]: Math.round(compareResult.net),
     },
   ];
 
   function downloadCsv() {
     const lines = [
-      ["Metric", country.name, compare.name],
+      ["Metric", cname(country.code), cname(compare.code)],
       ["Currency", country.currency, country.currency],
       ["Gross annual", result.gross.toFixed(2), compareResult.gross.toFixed(2)],
       ["Estimated tax", result.tax.toFixed(2), compareResult.tax.toFixed(2)],
-      ["Effective tax rate", (result.rate * 100).toFixed(2) + "%", (compareResult.rate * 100).toFixed(2) + "%"],
+      [
+        "Effective tax rate",
+        (result.rate * 100).toFixed(2) + "%",
+        (compareResult.rate * 100).toFixed(2) + "%",
+      ],
       ["Net annual", result.net.toFixed(2), compareResult.net.toFixed(2)],
       ["Net monthly", result.monthly.toFixed(2), compareResult.monthly.toFixed(2)],
       ["Net weekly", result.weekly.toFixed(2), compareResult.weekly.toFixed(2)],
@@ -116,6 +123,10 @@ export function SalaryCalculator({
     URL.revokeObjectURL(url);
   }
 
+  function exportPdf() {
+    window.print();
+  }
+
   return (
     <section className="card-surface flex flex-1 flex-col gap-6 p-6 sm:p-8">
       <header className="flex items-center gap-3">
@@ -123,14 +134,16 @@ export function SalaryCalculator({
           <Calculator className="size-5" />
         </span>
         <div>
-          <h2 className="text-lg font-semibold">Salary tax calculator</h2>
-          <p className="text-sm text-muted-foreground">Approximate progressive tax estimate</p>
+          <h2 className="text-lg font-semibold">{t("calcTitle")}</h2>
+          <p className="text-sm text-muted-foreground">{t("calcSubtitle")}</p>
         </div>
       </header>
 
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-1 space-y-2">
-          <Label htmlFor="salary">Annual salary ({country.currency})</Label>
+          <Label htmlFor="salary">
+            {t("annualSalary")} ({country.currency})
+          </Label>
           <Input
             id="salary"
             type="number"
@@ -142,7 +155,7 @@ export function SalaryCalculator({
           />
         </div>
         <div className="flex-1 space-y-2">
-          <Label>Country</Label>
+          <Label>{t("country")}</Label>
           <Select value={countryCode} onValueChange={setCountryCode}>
             <SelectTrigger>
               <SelectValue />
@@ -151,7 +164,7 @@ export function SalaryCalculator({
               {COUNTRIES.map((c) => (
                 <SelectItem key={c.code} value={c.code}>
                   <span className="flex items-center gap-2">
-                    <FlagIcon code={c.code} name={c.name} /> {c.name}
+                    <FlagIcon code={c.code} name={cname(c.code)} /> {cname(c.code)}
                   </span>
                 </SelectItem>
               ))}
@@ -162,7 +175,7 @@ export function SalaryCalculator({
 
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="font-medium">Effective tax rate</span>
+          <span className="font-medium">{t("effectiveRate")}</span>
           <span className="font-semibold text-primary">{(result.rate * 100).toFixed(1)}%</span>
         </div>
         <Progress value={Math.min(result.rate * 100, 100)} />
@@ -173,9 +186,9 @@ export function SalaryCalculator({
           <tbody>
             {rows.map((r) => (
               <tr key={r.label} className="border-b border-border last:border-0 odd:bg-muted/40">
-                <td className="px-4 py-3 text-muted-foreground">{r.label}</td>
+                <td className="px-4 py-3 text-start text-muted-foreground">{r.label}</td>
                 <td
-                  className={`px-4 py-3 text-right tabular-nums ${r.strong ? "text-base font-semibold text-accent" : "font-medium"}`}
+                  className={`px-4 py-3 text-end tabular-nums ${r.strong ? "text-base font-semibold text-accent" : "font-medium"}`}
                 >
                   {r.value}
                 </td>
@@ -187,7 +200,7 @@ export function SalaryCalculator({
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold">Salary breakdown</h3>
+          <h3 className="text-sm font-semibold">{t("breakdown")}</h3>
           <div className="h-44">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -219,7 +232,7 @@ export function SalaryCalculator({
 
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold">Country comparison</h3>
+            <h3 className="text-sm font-semibold">{t("comparison")}</h3>
             <Select value={compareCode} onValueChange={setCompareCode}>
               <SelectTrigger className="h-8 w-[9.5rem] text-xs">
                 <SelectValue />
@@ -228,7 +241,7 @@ export function SalaryCalculator({
                 {COUNTRIES.filter((c) => c.code !== country.code).map((c) => (
                   <SelectItem key={c.code} value={c.code}>
                     <span className="flex items-center gap-2">
-                      <FlagIcon code={c.code} name={c.name} /> {c.name}
+                      <FlagIcon code={c.code} name={cname(c.code)} /> {cname(c.code)}
                     </span>
                   </SelectItem>
                 ))}
@@ -241,8 +254,18 @@ export function SalaryCalculator({
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
                 <YAxis hide />
                 <Tooltip formatter={(v: number) => fmt(v)} />
-                <Bar dataKey="Net" fill="#0d9488" radius={[6, 6, 0, 0]} isAnimationActive={false} />
-                <Bar dataKey="Tax" fill="#2563eb" radius={[6, 6, 0, 0]} isAnimationActive={false} />
+                <Bar
+                  dataKey={t("netSalary")}
+                  fill="#0d9488"
+                  radius={[6, 6, 0, 0]}
+                  isAnimationActive={false}
+                />
+                <Bar
+                  dataKey={t("tax")}
+                  fill="#2563eb"
+                  radius={[6, 6, 0, 0]}
+                  isAnimationActive={false}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -252,11 +275,11 @@ export function SalaryCalculator({
       <div className="overflow-hidden rounded-xl border border-border">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
-              <th className="px-4 py-2 font-medium">Country</th>
-              <th className="px-4 py-2 text-right font-medium">Tax rate</th>
-              <th className="px-4 py-2 text-right font-medium">Tax</th>
-              <th className="px-4 py-2 text-right font-medium">Net salary</th>
+            <tr className="bg-muted/60 text-start text-xs uppercase tracking-wide text-muted-foreground">
+              <th className="px-4 py-2 text-start font-medium">{t("country")}</th>
+              <th className="px-4 py-2 text-end font-medium">{t("taxRate")}</th>
+              <th className="px-4 py-2 text-end font-medium">{t("tax")}</th>
+              <th className="px-4 py-2 text-end font-medium">{t("netSalary")}</th>
             </tr>
           </thead>
           <tbody>
@@ -267,27 +290,30 @@ export function SalaryCalculator({
               <tr key={c.code} className="border-t border-border">
                 <td className="px-4 py-3 font-medium">
                   <span className="flex items-center gap-2">
-                    <FlagIcon code={c.code} name={c.name} /> {c.name}
+                    <FlagIcon code={c.code} name={cname(c.code)} /> {cname(c.code)}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right tabular-nums">{(r.rate * 100).toFixed(1)}%</td>
-                <td className="px-4 py-3 text-right tabular-nums">{fmt(r.tax)}</td>
-                <td className="px-4 py-3 text-right font-semibold tabular-nums">{fmt(r.net)}</td>
+                <td className="px-4 py-3 text-end tabular-nums">{(r.rate * 100).toFixed(1)}%</td>
+                <td className="px-4 py-3 text-end tabular-nums">{fmt(r.tax)}</td>
+                <td className="px-4 py-3 text-end font-semibold tabular-nums">{fmt(r.net)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Button variant="gradient" onClick={downloadCsv}>
-          <Download /> Download CSV
+      <div className="flex flex-wrap items-center gap-3">
+        <Button variant="gradient" onClick={exportPdf} className="no-print">
+          <FileText /> {t("exportPdf")}
         </Button>
-        <Button variant="soft" onClick={onReset}>
-          <RotateCcw /> Reset
+        <Button variant="soft" onClick={downloadCsv} className="no-print">
+          <Download /> {t("downloadCsv")}
         </Button>
-        <span className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Wallet className="size-3.5" /> Comparison shown in {country.currency}
+        <Button variant="soft" onClick={onReset} className="no-print">
+          <RotateCcw /> {t("reset")}
+        </Button>
+        <span className="ms-auto flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Wallet className="size-3.5" /> {t("shownIn")} {country.currency}
         </span>
       </div>
     </section>

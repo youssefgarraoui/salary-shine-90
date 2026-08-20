@@ -12,11 +12,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CURRENCIES, convert, formatMoney, type CurrencyCode } from "@/lib/finance";
+import { useI18n } from "@/lib/i18n";
 
 export function CurrencyConverter() {
+  const { t, locale } = useI18n();
   const [amount, setAmount] = useState("1000");
-  const [from, setFrom] = useState<CurrencyCode>("TND");
-  const [to, setTo] = useState<CurrencyCode>("EUR");
+  const [from, setFrom] = useState<CurrencyCode>("EUR");
+  const [to, setTo] = useState<CurrencyCode>("TND");
 
   const value = Math.max(0, Number(amount) || 0);
   const converted = convert(value, from, to);
@@ -34,13 +36,13 @@ export function CurrencyConverter() {
           <Repeat className="size-5" />
         </span>
         <div>
-          <h2 className="text-lg font-semibold">Currency converter</h2>
-          <p className="text-sm text-muted-foreground">Instant conversion, approximate rates</p>
+          <h2 className="text-lg font-semibold">{t("fxTitle")}</h2>
+          <p className="text-sm text-muted-foreground">{t("fxSubtitle")}</p>
         </div>
       </header>
 
       <div className="space-y-2">
-        <Label htmlFor="amount">Amount</Label>
+        <Label htmlFor="amount">{t("amount")}</Label>
         <Input
           id="amount"
           type="number"
@@ -53,7 +55,7 @@ export function CurrencyConverter() {
 
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-end">
         <div className="flex-1 space-y-2">
-          <Label>From</Label>
+          <Label>{t("from")}</Label>
           <Select value={from} onValueChange={(v) => setFrom(v as CurrencyCode)}>
             <SelectTrigger>
               <SelectValue />
@@ -67,11 +69,17 @@ export function CurrencyConverter() {
             </SelectContent>
           </Select>
         </div>
-        <Button variant="soft" size="icon" onClick={swap} aria-label="Swap currencies">
+        <Button
+          variant="soft"
+          size="icon"
+          onClick={swap}
+          aria-label={t("swap")}
+          className="no-print"
+        >
           <ArrowLeftRight />
         </Button>
         <div className="flex-1 space-y-2">
-          <Label>To</Label>
+          <Label>{t("to")}</Label>
           <Select value={to} onValueChange={(v) => setTo(v as CurrencyCode)}>
             <SelectTrigger>
               <SelectValue />
@@ -88,25 +96,30 @@ export function CurrencyConverter() {
       </div>
 
       <div className="rounded-2xl border border-border bg-[image:var(--gradient-surface)] p-6 text-center">
-        <p className="text-sm text-muted-foreground">{formatMoney(value, from)} equals</p>
-        <p className="mt-1 text-3xl font-bold gradient-text sm:text-4xl">
-          {formatMoney(converted, to)}
+        <p className="text-sm text-muted-foreground">
+          {formatMoney(value, from, locale)} {t("equals")}
         </p>
-        <p className="mt-2 text-xs text-muted-foreground">
+        <p className="mt-1 text-3xl font-bold gradient-text sm:text-4xl">
+          {formatMoney(converted, to, locale)}
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground" dir="ltr">
           1 {from} ≈ {unit.toFixed(4)} {to}
         </p>
       </div>
 
       <div>
-        <h3 className="mb-2 text-sm font-semibold">Quick rates from {from}</h3>
+        <h3 className="mb-2 text-sm font-semibold">
+          {t("quickRates")} {from}
+        </h3>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {CURRENCIES.filter((c) => c.code !== from).map((c) => (
             <div
               key={c.code}
               className="rounded-xl border border-border bg-muted/40 px-3 py-2 text-sm"
+              dir="ltr"
             >
               <span className="font-medium">{c.code}</span>
-              <span className="ml-2 tabular-nums text-muted-foreground">
+              <span className="ms-2 tabular-nums text-muted-foreground">
                 {convert(1, from, c.code).toFixed(3)}
               </span>
             </div>
