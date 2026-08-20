@@ -22,14 +22,18 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: () => (
-    <LanguageProvider>
-      <Index />
-    </LanguageProvider>
-  ),
+  component: Index,
 });
 
 function Index() {
+  return (
+    <LanguageProvider>
+      <Dashboard />
+    </LanguageProvider>
+  );
+}
+
+function Dashboard() {
   const { t } = useI18n();
   const [salary, setSalary] = useState("60000");
   const [countryCode, setCountryCode] = useState("FR");
